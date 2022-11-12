@@ -57,3 +57,6 @@ Using Materialize, a modern design may be applied to the web app. In this case, 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/26052421/201490608-0dd21c46-e552-42ac-818f-26e8e690f608.png"/>
 </p>
+
+# Service Interruption
+The feature layer service containing the points for the cellular service towers is no longer available. However, the HTML/web map page is still navigable. To resolve this, the layer needs to be reuploaded as a service. Another solution could be to implement a JSON solution.
