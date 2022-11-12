@@ -18,6 +18,18 @@ In additional to converting the raw data to .csv format, additional processing i
 3)	Since only one record will represent one location, new fields were created to store the Receiving Frequency values for each antenna that is present at that site. All other fields were deleted for simplicity. To normalize the raw data, each Receiving Frequency field was rounded down and duplicate values were removed.
 4)	A field NO, was created to track how many unique Receiving Frequency values were extracted from the raw data.
 
+## parse.py ##
+
+This Python script reads a Spectrum Licences (Site Information) text file, parses, and produces a .csv file containing the information for each site along with the converted geographic coordinates in decimal degree format.
+
+## formatCSV.py ##
+
+This Python script reads the output from parse.py and formats the original values (such as cell service provider names) to a more presentable format.
+
+## createPoints.py ##
+
+This Python script leverages Esri’s Arcpy Python library to use the coordinates found in the formatted .csv file to create a shapefile (.shp).
+
 # Converting Comma Separated File to Shapefile
 Using a Python script, the .csv file is converted to a shapefile. Open the shapefile in ArcMap to check if the coordinates of each point feature is correct and if there are any other problems. 
 
