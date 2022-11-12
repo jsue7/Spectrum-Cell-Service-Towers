@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Cellular Antenna Locations in Canada</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="description" content="Locations of Cellular Antennas and its providers across Canada.">
+		<meta name="author" content="Jack Su">
+		
+		<!--Import materialize.css-->
+		<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css"  media="screen,projection"/>
+
+		<!--Let browser know website is optimized for mobile-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		
+		<!-- Load Leaflet from CDN-->
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css">
+		<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script><style type="text/css"></style>
+				   
+		<!-- Load Esri Leaflet from CDN -->
+		<script src="http://cdn-geoweb.s3.amazonaws.com/esri-leaflet/1.0.0-rc.2/esri-leaflet.js"></script>
+			
+		<!-- Include Leaflet.markercluster via rawgit.com, do not use in production -->
+		<link rel="stylesheet" type="text/css" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css">
+		<link rel="stylesheet" type="text/css" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css">
+		<script src="http://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+		<!-- Load Clustered Feature Layer from CDN -->
+		<script src="http://cdn-geoweb.s3.amazonaws.com/esri-leaflet-clustered-feature-layer/1.0.0-rc.1/esri-leaflet-clustered-feature-layer.js"></script>
+		<!-- Cluster Pie Source --> 
+		<!-- http://bl.ocks.org/gisminister/10001728 -->
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+					
+		<style>
+			body { margin:0; padding:0; }
+			#map { position: absolute; top:0; bottom:0; right:0; left:0; }
+		</style>
+	</head>
+
+    <body>
+		<!--Import jQuery before materialize.js-->
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
+		<style>
+			/*Marker clusters*/
+			.marker-cluster-pie g.arc{
+				fill-opacity: 0.5;
+			}
+			.marker-cluster-pie-label {
+				font-size: 20px
+				font-weight: bold;
+				font-family: arial;
+				fill: #ffffff;
+			}		
+			
+			.icon-bell {
+				background: #2d84c8;
+				border-radius: 50%;
+				text-align: center;
+				color: white;
+				font-weight: 700;
+				border: 1px solid #2d84c8;
+				font-family: monospace;
+			}
+
+			.icon-bell:before {
+				content: ' ';
+				position: absolute;
+				border-radius: 50%;
+				z-index: -1;
+				top: 1px;
+				left: 1px;
+				right: 1px;
+				bottom: 1px;
+				border: 1px solid white;
+			}
+
+			.icon-rogers {
+				background: #d33b45;
+				border-radius: 50%;
+				text-align: center;
+				color: white;
+				font-weight: 700;
+				border: 1px solid #d33b45;
+				font-family: monospace;
+			}
+
+			.icon-rogers:before {
+				content: ' ';
+				position: absolute;
+				border-radius: 50%;
+				z-index: -1;
+				top: 1px;
+				left: 1px;
+				right: 1px;
+				bottom: 1px;
+				border: 1px solid white;
+			}
+
+			.icon-telus {
+				background: #59d850;
+				border-radius: 50%;
+				text-align: center;
+				color: white;
+				font-weight: 700;
+				border: 1px solid #59d850;
+				font-family: monospace;
+			}
+
+			.icon-telus:before {
+				content: ' ';
+				position: absolute;
+				border-radius: 50%;
+				z-index: -1;
+				top: 1px;
+				left: 1px;
+				right: 1px;
+				bottom: 1px;
+				border: 1px solid white;
+			}
+			
+			.icon-other {
+				background: #393939;
+				border-radius: 50%;
+				text-align: center;
+				color: white;
+				font-weight: 700;
+				border: 1px solid #393939;
+				font-family: monospace;
+			}
+			
+			.icon-other:before {
+				content: ' ';
+				position: absolute;
+				border-radius: 50%;
+				z-index: -1;
+				top: 1px;
+				left: 1px;
+				right: 1px;
+				bottom: 1px;
+				border: 1px solid white;
+			}
+		
+			/*marker categories*/
+			.category-Rogers{
+				fill: #d33b45;
+				stroke: #9e242c;
+				background: #d33b45;
+				border-color: #9e242c;
+			}
+			.category-Telus{
+				fill: #59d850;
+				stroke: #37c82d;
+				background: #59d850;
+				border-color: #37c82d;
+			}
+			.category-Bell{
+				fill: #2d84c8;
+				stroke: #24699e;
+				background: #2d84c8;
+				border-color: #24699e;
+			}
+			.category-Other{
+				fill: #393939;
+				stroke: #000000;
+				background: #393939;
+				border-color: #000000;
+			}
+		</style>
+		
+		<!-- Dropdown Basemaps -->
+		<ul id="dropbasemap" class="dropdown-content">
+			<li><a href="javascript:setBasemap('Gray');">Gray</a></li>
+			<li><a href="javascript:setBasemap('Topographic');">Topographic</a></li>
+			<li><a href="javascript:setBasemap('Streets');">Streets</a></li>
+			<li><a href="javascript:setBasemap('NationalGeographic');">National Geographic</a></li>
+			<li><a href="javascript:setBasemap('Imagery');">Imagery</a></li>
+			<li><a href="javascript:setBasemap('ShadedRelief');">Shaded Relief</a></li>
+		</ul>
+		
+		<!-- Dropdown Mobile Providers -->
+		<ul id="dropprovider" class="dropdown-content">
+			<li><a href="javascript:setProvider('');">All</a></li>
+			<li><a href="javascript:setProvider('Rogers Wireless');">Rogers</a></li>
+			<li><a href="javascript:setProvider('Telus Mobility');">Telus</a></li>
+			<li><a href="javascript:setProvider('Bell Mobility');">Bell</a></li>
+			<li><a href="javascript:setProvider('EastLink');">EastLink</a></li>
+			<li><a href="javascript:setProvider('Ice');">Ice</a></li>
+			<li><a href="javascript:setProvider('Lynx');">Lynx</a></li>
+			<li><a href="javascript:setProvider('MTS');">MTS</a></li>
+			<li><a href="javascript:setProvider('Nexicom');">Nexicom</a></li>
+			<li><a href="javascript:setProvider('SaskTel');">SaskTel</a></li>
+			<li><a href="javascript:setProvider('Sogetel');">Sogetel</a></li>
+			<li><a href="javascript:setProvider('TBayTel');">TBayTel</a></li>
+			<li><a href="javascript:setProvider('Videotron');">Videotron</a></li>
+			<li><a href="javascript:setProvider('Wind Mobile');">Wind Mobile</a></li>
+		</ul>		
+		
+		<!-- Dropdown Basemaps -->
+		<ul id="dropbasemap2" class="dropdown-content">
+			<li><a href="javascript:setBasemap('Gray');">Gray</a></li>
+			<li><a href="javascript:setBasemap('Topographic');">Topographic</a></li>
+			<li><a href="javascript:setBasemap('Streets');">Streets</a></li>
+			<li><a href="javascript:setBasemap('NationalGeographic');">NationalGeographic</a></li>
+			<li><a href="javascript:setBasemap('Imagery');">Imagery</a></li>
+			<li><a href="javascript:setBasemap('ShadedRelief');">Shaded Relief</a></li>
+		</ul>
+		
+		<!-- Dropdown Mobile Providers -->
+		<ul id="dropprovider2" class="dropdown-content">
+			<li><a href="javascript:setProvider('');">All</a></li>
+			<li><a href="javascript:setProvider('Rogers Wireless');">Rogers</a></li>
+			<li><a href="javascript:setProvider('Telus Mobility');">Telus</a></li>
+			<li><a href="javascript:setProvider('Bell Mobility');">Bell</a></li>
+			<li><a href="javascript:setProvider('EastLink');">EastLink</a></li>
+			<li><a href="javascript:setProvider('Ice');">Ice</a></li>
+			<li><a href="javascript:setProvider('Lynx');">Lynx</a></li>
+			<li><a href="javascript:setProvider('MTS');">MTS</a></li>
+			<li><a href="javascript:setProvider('Nexicom');">Nexicom</a></li>
+			<li><a href="javascript:setProvider('SaskTel');">SaskTel</a></li>
+			<li><a href="javascript:setProvider('Sogetel');">Sogetel</a></li>
+			<li><a href="javascript:setProvider('TBayTel');">TBayTel</a></li>
+			<li><a href="javascript:setProvider('Videotron');">Videotron</a></li>
+			<li><a href="javascript:setProvider('Wind Mobile');">Wind Mobile</a></li>
+		</ul>	
+		
+		<!-- Modal Structure - Start Up Guide -->
+		<div id="modal1" class="modal">
+			<div class="modal-content">
+				<h4>Telecommunications in Canada</h4>
+				<p>On August 10, 1876, Alexander Graham Bell made the world’s first long distance telephone call from Brantford to Paris in Ontario, Canada. With the rapid advancements in telecommunications technology today, Bell’s breakthrough invention of the telephone approximately a century and a half ago seems ancient. In today’s society, a person with a smartphone equipped with a data plan can connect and communicate with others around the world in a matter of seconds.</p>
+				<p>This is made possible by radio (cellular) towers and antennas across the country. This web map application is an interactive overview of the locations of these radio antennas, its service provider, and the receiving frequencies at which these antennas operate at.</p>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Ok</a>
+			</div>
+		</div>
+		
+		<!-- Modal Structure - Information -->
+		<div id="modal2" class="modal modal-fixed-footer">
+			<div class="modal-content">
+				<h4>Information</h4>
+				<p>Cellular towers and antenna locations are retrieved as a Technical and Administrative Frequency Lists (TAFL) file from Industry Canada's website. This dataset is accurate as of June 12, 2015.</p>
+				<h5>List of Mobile Providers</h5>
+				<span class='red-text text-darken-3'><p>Rogers Wireless</p></span>
+				<span class='light-green-text text-darken-1'><p>Telus Mobility</p></span>
+				<span class='blue-text text-darken-3'><p>Bell Mobility</p></span>
+				<p>EastLink</p>
+				<p>Ice</p>
+				<p>Lynx</p>
+				<p>Manitoba Telecom Services (MTS)</p>
+				<p>Nexicom</p>
+				<p>SaskTel</p>
+				<p>Sogetel</p>
+				<p>TBayTel</p>
+				<p>Videotron</p>
+				<p>Wind Mobile</p>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat "><i class="material-icons">done</i></a>
+			</div>
+		</div>
+		
+		<!-- Navigation header -->
+		<div class="navbar-fixed">	
+			<nav class="teal" role="navigation">
+				<div class="nav-wrapper">
+					<a href="#" onclick="location.reload(true);" class="brand-logo center">Cellular Antennas in Canada</a>
+					<ul id="nav-mobile" class="left hide-on-med-and-down">
+						<li><a class="modal-trigger" href="javascript:$('#modal2').openModal();" data-target="#modal2"><i class="material-icons left">info</i></a></li>
+					</ul>
+					<ul id="nav-mobile" class="right hide-on-med-and-down">
+						<li><a class="dropdown-button" href="#!" data-activates="dropprovider">Mobile Provider<i class="material-icons right">arrow_drop_down</i></a></li>
+						<li><a class="dropdown-button" href="#!" data-activates="dropbasemap">Basemap<i class="material-icons right">arrow_drop_down</i></a></li>
+					</ul>
+					<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+					<ul class="side-nav" id="mobile-demo">
+						<li><a class="modal-trigger" href="javascript:$('#modal2').openModal();" data-target="#modal2">Information<i class="material-icons left">info</i></a></li>
+						<li><a class="dropdown-button" href="#!" data-activates="dropprovider2">Mobile Provider<i class="material-icons right">arrow_drop_down</i></a></li>
+						<li><a class="dropdown-button" href="#!" data-activates="dropbasemap2">Basemap<i class="material-icons right">arrow_drop_down</i></a></li>
+					</ul>
+				</div>				
+			</nav>
+		</div>
+		
+		<div class="section no-pad-bot" id="index-banner">
+
+		</div>
+		
+		<!-- Container element containing Map and FAB -->
+		<div class="container">
+			<div id="map" class="custom-popup"></div>
+			<div class="fixed-action-btn" style="bottom: 80px; right: 24px;">
+				<a class="btn-floating btn-large waves-effect waves-light teal" href="javascript:locateUser();">
+					<i class="large material-icons">my_location</i>
+				</a>
+			 </div>
+		</div>
+
+		<!-- Main Javascript -->
+		<script>
+			// Activates pop-up at start-up and enables sidebar navigation on mobile devices
+			$('#modal1').openModal();
+			$(".button-collapse").sideNav();
+			
+			// Define map variable to Canadian extend and desirable zoom control
+			// Set the basemap to Gray scale
+			var map = L.map('map', {zoomControl: false}).setView([64.318401, -96.019005], 4);
+			var layer = L.esri.basemapLayer("Gray").addTo(map);
+			
+			// Using the Geolocation API, locate where the user's device is
+			function locateUser() {
+				map.locate({
+					setView : true});
+			}
+			
+			// Variable for basemap labels
+			var layerLabels = L.esri.basemapLayer("GrayLabels").addTo(map);
+			
+			// Sets the basemap to the one specified by the user
+			function setBasemap(basemap) {
+				if (layer) {
+					map.removeLayer(layer);
+				}
+				layer = L.esri.basemapLayer(basemap);
+				map.addLayer(layer);
+				if (layerLabels) {
+					map.removeLayer(layerLabels);
+				}
+
+				if (basemap === 'ShadedRelief' || basemap === 'Oceans' || basemap === 'Gray' || basemap === 'DarkGray' || basemap === 'Imagery' || basemap === 'Terrain') {
+					layerLabels = L.esri.basemapLayer(basemap + 'Labels');
+					map.addLayer(layerLabels);
+				}
+			}
+			
+			// Add scale
+			L.control.scale().addTo(map);
+			
+			var _serializeXmlNode = function(xmlNode) {
+
+				// polymer hack
+				if (xmlNode.__impl4cf1e782hg__) {
+					xmlNode = xmlNode.__impl4cf1e782hg__;
+				}
+				if (typeof window.XMLSerializer !== "undefined") {
+					return (new window.XMLSerializer()).serializeToString(xmlNode);
+				} else if (typeof xmlNode.xml !== "undefined") {
+					return xmlNode.xml;
+				}
+				return "";
+			}
+
+			/* function that generates a svg markup for the pie chart */
+			_bakeThePie = function(options) {
+
+				/*data and valueFunc are required*/
+				if (!options.data || !options.valueFunc) {
+					return '';
+				}
+				var data = options.data,
+					valueFunc = options.valueFunc,
+					r = options.outerRadius?options.outerRadius: 28, //Default outer radius = 28px
+					rInner = options.innerRadius?options.innerRadius: r - 10, //Default inner radius = r-10
+					strokeWidth = options.strokeWidth?options.strokeWidth: 1, //Default stroke is 1
+					pathClassFunc = options.pathClassFunc?options.pathClassFunc: function() {
+					  return '';
+					}, //Class for each path
+					pathTitleFunc = options.pathTitleFunc?options.pathTitleFunc: function() {
+					  return '';
+					}, //Title for each path
+					pieClass = options.pieClass?options.pieClass: 'marker-cluster-pie', //Class for the whole pie
+					pieLabel = options.pieLabel?options.pieLabel: d3.sum(data, valueFunc), //Label for the whole pie
+					pieLabelClass = options.pieLabelClass?options.pieLabelClass: 'marker-cluster-pie-label',//Class for the pie label
+					origo = (r + strokeWidth), //Center coordinate
+					w = origo * 2, //width and height of the svg element
+					h = w,
+					donut = d3.layout.pie(),
+					arc = d3.svg.arc().innerRadius(rInner).outerRadius(r);
+
+					//Create an svg element
+					var svg = document.createElementNS(d3.ns.prefix.svg, 'svg');
+					//Create the pie chart
+					var vis = d3.select(svg)
+						.data([data])
+						.attr('class', pieClass)
+						.attr('width', w)
+						.attr('height', h);
+
+					var arcs = vis.selectAll('g.arc')
+						.data(donut.value(valueFunc))
+						.enter().append('svg:g')
+						.attr('class', 'arc')
+						.attr('transform', 'translate(' + origo + ',' + origo + ')');
+
+					arcs.append('svg:path')
+						.attr('class', pathClassFunc)
+						.attr('stroke-width', strokeWidth)
+						.attr('d', arc)
+						.append('svg:title')
+						.text(pathTitleFunc);
+
+					vis.append('text')
+						.attr('x', origo)
+						.attr('y', origo)
+						.attr('class', pieLabelClass)
+						.attr('text-anchor', 'middle')
+						//.attr('dominant-baseline', 'central')
+						/*IE doesn't seem to support dominant-baseline, but setting dy to .3em does the trick*/
+						.attr('dy', '.3em')
+						.text(pieLabel);
+
+					//Return the svg-markup rather than the actual element
+					return _serializeXmlNode(svg);
+			}
+
+			/**
+			 * Public
+			 */
+
+			defineClusterIcon = function(cluster) {
+
+				var children = cluster.getAllChildMarkers(),
+				n = children.length, // Get number of markers in cluster
+				strokeWidth = 1, // Set clusterpie stroke width
+				r = 35 - 2 * strokeWidth - (n < 10 ? 12:n < 100 ? 8:n < 1000 ? 4:0), //Calculate clusterpie radius...
+				iconDim = (r + strokeWidth) * 2, //...and divIcon dimensions (leaflet really wants to know the size)
+				data = d3.nest() // Build a dataset for the pie chart
+					.key(function(d) {
+					return d.feature.properties.Provider;
+					})
+					.entries(children, d3.map),
+				// bake some svg markup
+				html = _bakeThePie({data: data,
+					valueFunc: function(d) {
+					return d.values.length;
+				},
+					strokeWidth: 1,
+					outerRadius: r,
+					innerRadius: -1,
+					pieClass: 'cluster-pie',
+					pieLabel: n,
+					pieLabelClass: 'marker-cluster-pie-label',
+					pathClassFunc: function(d) {
+						if(d.data.key == "Rogers Wireless" || d.data.key == "Bell Mobility" || d.data.key == "Telus Mobility"){
+							return "category-" + d.data.key
+							//return "category-" + d.data.key.split(" ", 1);
+						} 
+						else {
+							return "category-Other"
+						}
+					},
+					pathTitleFunc: function(d) {
+						return d.data.key + ' (' + d.data.values.length + ' Antenna' + (d.data.values.length !== 1 ? 's':'') + ')';
+					}
+				}),
+				// Create a new divIcon and assign the svg markup to the html property
+				myIcon = new L.DivIcon({
+					html: html,
+					className: 'marker-cluster',
+					iconSize: new L.Point(iconDim, iconDim)
+				});
+			  return myIcon;
+			}
+			
+			// Url to where the map service is hosted
+			var url = "http://maps.esri.ca/arcgis/rest/services/StoryMapServices_Students/Spectrum_lic/MapServer/0";
+			
+			// List containing the class names of the icon styles for each Mobile Provider
+			var icons = {
+				rogers : new L.DivIcon({className: 'icon-rogers'
+				}),
+				telus : new L.DivIcon({className: 'icon-telus'
+				}),
+				bell: new L.DivIcon({className: 'icon-bell'
+				}),
+				other: new L.DivIcon({className: 'icon-other'
+				}),
+			};
+			
+			// Create clustered feature layer
+			var towers = L.esri.clusteredFeatureLayer(url, {
+				spiderfyOnMaxZoom:true,
+				disableClusteringAtZoom: 12,
+				polygonOptions: {
+					color: '#d85059',
+					weight: 4,
+					opacity: 1,
+					fillOpacity: 0.5
+				},
+				// this function defines how the icons
+				// representing the clusters are created
+				iconCreateFunction: defineClusterIcon,
+				// Symbolize markers
+				pointToLayer: function(geojson, latlng) {
+					providerCheck = geojson.properties.Provider.toLowerCase().split(" ", 1);
+					if (providerCheck == "rogers" || providerCheck == "telus" || providerCheck == "bell") {
+						return L.marker(latlng, {
+							icon: icons[providerCheck]
+						});
+					} else {
+						return L.marker(latlng, {
+							icon: icons["other"]
+						});
+					}
+				}
+			}).addTo(map);
+			
+			// Sets the view to the specific provider selected by the user
+			function setProvider(provider) {
+				if(provider == ''){
+					towers.setWhere('Provider=\'Rogers Wireless\' OR Provider=\'Telus Mobility\' OR Provider=\'Bell Mobility\' OR Provider=\'EastLink\' OR Provider=\'Ice\' OR Provider=\'Lynx\' OR Provider=\'MTS\' OR Provider=\'Nexicom\' OR Provider=\'SaskTel\' OR Provider=\'Sogetel\' OR Provider=\'TBayTel\' OR Provider=\'Videotron\' OR Provider=\'Wind Mobile\'');
+				} else {
+					towers.setWhere('Provider=\'' + provider + '\'');
+				}
+			}
+			
+			// Create pop ups for markers
+			towers.bindPopup(function(feature){
+				if(feature.properties.NO == 1){
+					return L.Util.template('<b>Provider:</b> {Provider}<br><b>Receiving Frequency:</b> {F1}', feature.properties);
+				} else if (feature.properties.NO == 2){
+					return L.Util.template('<b>Provider:</b> {Provider}<br><b>Receiving Frequencies:</b><br>{F1}<br>{F2}', feature.properties);
+				} else if (feature.properties.NO == 3){
+					return L.Util.template('<b>Provider:</b> {Provider}<br><b>Receiving Frequencies:</b><br>{F1}<br>{F2}<br>{F3}', feature.properties);
+				} else if (feature.properties.NO == 4){
+					return L.Util.template('<b>Provider:</b> {Provider}<br><b>Receiving Frequencies:</b><br>{F1}<br>{F2}<br>{F3}<br>{F4}', feature.properties);
+				} else if (feature.properties.NO == 5){
+					return L.Util.template('<b>Provider:</b> {Provider}<br><b>Receiving Frequencies:</b><br>{F1}<br>{F2}<br>{F3}<br>{F4}<br>{F5}', feature.properties);
+				} else if (feature.properties.NO == 6){
+					return L.Util.template('<b>Provider:</b> {Provider}<br><b>Receiving Frequencies:</b><br>{F1}<br>{F2}<br>{F3}<br>{F4}<br>{F5}<br>{F6}', feature.properties);
+				} else if (feature.properties.NO == 7){
+					return L.Util.template('<b>Provider:</b> {Provider}<br><b>Receiving Frequencies:</b><br>{F1}<br>{F2}<br>{F3}<br>{F4}<br>{F5}<br>{F6}<br>{F7}', feature.properties);
+				} else if (feature.properties.NO == 8){ 
+					return L.Util.template('<b>Provider:</b> {Provider}<br><b>Receiving Frequencies:</b><br>{F1}<br>{F2}<br>{F3}<br>{F4}<br>{F5}<br>{F6}<br>{F7}<br>{F8}', feature.properties);
+				} else {
+					return L.Util.template('<b>Provider:</b> {Provider}<br><b>Transmitting Frequency:</b> {F1}<br><b>Receiving Frequency:</b> {F2}', feature.properties);
+				}
+			});
+		</script>
+	</body>
+</html>
