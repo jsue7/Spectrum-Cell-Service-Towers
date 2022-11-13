@@ -1,4 +1,4 @@
-# Spectrum Cell Serivce Towers
+# Spectrum Cell Service Towers
 This project process raw data downloaded from Canada’s TAFL (Technical and Administrative Frequency List) database and presents it visually using a web map. This document will highlight the process used to create a story map of the locations of cellular antennas across the country of Canada and whom they belong to. Raw data was retrieved from Industry Canada’s website and processed with Python. Finally, the Leaflet, Esri Leaflet, and Materialize CSS API were used to create the web mapping application. 
 
 # Raw Data
