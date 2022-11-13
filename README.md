@@ -5,7 +5,7 @@ This project process raw data downloaded from Canada’s TAFL (Technical and Adm
 From Industry Canada’s website, a Technical and Administrative Frequency List (TAFL) text file can be downloaded containing information regarding all of the spectrum licences (http://spectrum.ic.gc.ca/tafl/taflindex.html#National). Under the National TAFL, the file containing this information is named labeled Spectrum Licences Site Information. 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/26052421/201490593-be63cb11-8a3e-47ba-9b0c-46afc81d5499.png"/>
+  <img src="https://user-images.githubusercontent.com/26052421/201490593-be63cb11-8a3e-47ba-9b0c-46afc81d5499.png" width="400"/>
 </p>
 
 # Processing Raw Data using Python
@@ -34,7 +34,7 @@ This Python script leverages Esri’s Arcpy Python library to use the coordinate
 Using a Python script, the .csv file is converted to a shapefile. Open the shapefile in ArcMap to check if the coordinates of each point feature is correct and if there are any other problems. 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/26052421/201490602-f0123c8c-e5a6-4c02-b845-7c54869fc3fc.png"/>
+  <img src="https://user-images.githubusercontent.com/26052421/201490602-f0123c8c-e5a6-4c02-b845-7c54869fc3fc.png" width="500"/>
 </p>
 
 # Upload Shapefile as a Service
@@ -48,14 +48,14 @@ With reference to the reac.TOR application created by Esri Canada’s Cameron Pl
 Using the Leaflet API reference (http://leafletjs.com/reference.html), customizations such as icon symbology, queries, basemap changes, scale, and etc. could be added with ease.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/26052421/201490603-d5033ad0-fa19-42bd-9461-e7cf8f76b9bf.png"/>
+  <img src="https://user-images.githubusercontent.com/26052421/201490603-d5033ad0-fa19-42bd-9461-e7cf8f76b9bf.png" width="500"/>
 </p>
 
 # Styling With Materialize CSS
 Using Materialize, a modern design may be applied to the web app. In this case, a header was applied, the query and basemap changer incorporated into the header, and information button, and finally a floating action button to geolocate the user’s device.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/26052421/201490608-0dd21c46-e552-42ac-818f-26e8e690f608.png"/>
+  <img src="https://user-images.githubusercontent.com/26052421/201490608-0dd21c46-e552-42ac-818f-26e8e690f608.png" width="500"/>
 </p>
 
 # Service Interruption
